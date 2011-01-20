@@ -38,6 +38,7 @@
         </div>
 
         <div class="field actions">
+            #getRequest().getCSRFInputTag()#
             <input type="submit" value="Submit">
         </div>
     </form>

@@ -57,6 +57,10 @@
             name="via"
             type="string"
             default="ALL">
+        <cfargument
+            name="protectFromForgery"
+            type="boolean"
+            default="#this.getSetting("protect_from_forgery", "true")#">
         <cfset pattern = getController().getModuleService().newRegex(pattern)>
         <cfset ArrayAppend(this.getMappings(), arguments)>
     </cffunction>
@@ -82,8 +86,12 @@
             index="local.mapping"
             array="#getMappings()#">
             <cfif mapping.pattern.isMatch(path)
-                and meetsMethodConstraints(requestContext, mapping.via)
-                and meetsRequestConstraints(requestContext, mapping.constraints)>
+                and meetsConstraints(requestContext, mapping)>
+                <cfif mapping.protectFromForgery and not requestContext.verifyCSRFToken()>
+                    <cfthrow
+                        type="pistachio.InvalidAuthenticityToken">
+                </cfif>
+
                 <cfreturn {
                     component=mapping.component,
                     method=mapping.method,
@@ -93,6 +101,23 @@
         </cfloop>
 
         <cfreturn false>
+    </cffunction>
+
+
+    <cffunction
+        name="meetsConstraints"
+        returnType="boolean">
+        <cfargument
+            name="requestContext"
+            type="any"
+            required="yes">
+        <cfargument
+            name="mapping"
+            type="struct"
+            required="yes">
+        <cfreturn
+            meetsMethodConstraints(requestContext, mapping.via)
+            and meetsRequestConstraints(requestContext, mapping.constraints)>
     </cffunction>
 
 

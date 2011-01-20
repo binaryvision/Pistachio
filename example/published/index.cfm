@@ -1,23 +1,13 @@
+<cfset pistachio = new pistachio.BaseComponent(application.pistachio)>
+<cfoutput>
 <!doctype html>
 <html>
     <head>
+        #pistachio.getRequest().getCSRFMetaTags()#
         <title>Contact Form</title>
     </head>
     <body>
-        <cffunction
-            name="getController"
-            returnType="any">
-            <cfreturn application.pistachio>
-        </cffunction>
-
-        <cffunction
-            name="getRequest"
-            returnType="any">
-            <cfreturn getController().getRequestService().getRequestContext()>
-        </cffunction>
-
-        <cfoutput>
-            #getController().getModuleService().dispatch("contactform", getRequest())#
-        </cfoutput>
+        #pistachio.getController().getModuleService().dispatch("contactform", pistachio.getRequest())#
     </body>
 </html>
+</cfoutput>

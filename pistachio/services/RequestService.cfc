@@ -27,6 +27,7 @@
         name="createRequestContext"
         returnType="any">
         <cfset var context = new pistachio.http.RequestBean()>
+        <cfset context.setController(getController())>
         <cfset context.setEnv(cgi)>
         <cfset context.setRequestData(GetHttpRequestData())>
         <cfset context.appendCollection(getPageContext().getRequest().getParameterMap())>

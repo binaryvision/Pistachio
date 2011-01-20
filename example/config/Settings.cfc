@@ -15,5 +15,7 @@ component
     ];
 
     encrypt_cookies = false;
+
+    protect_from_forgery = true;
 }
 </cfscript>

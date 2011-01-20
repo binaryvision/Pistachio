@@ -77,8 +77,7 @@
 
         <cfif not IsStruct(handler)>
             <cfthrow
-                type="pistachio.PageNotFound"
-                message="404 Page not found">
+                type="pistachio.PageNotFound">
         </cfif>
 
         <cfinvoke

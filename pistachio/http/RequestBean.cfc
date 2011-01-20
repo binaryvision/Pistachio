@@ -224,4 +224,48 @@
 
         <cfreturn struct>
     </cffunction>
+
+
+    <cffunction
+        name="getCSRFParam"
+        returnType="string">
+        <cfreturn getSetting("csrf_param", "authenticity_token")>
+    </cffunction>
+
+
+    <cffunction
+        name="getCSRFToken"
+        returnType="string">
+        <cfset var csrfTokenKey = getSetting("csrf_token", "_csrf_token")>
+        <cfparam
+            name="session.#csrfTokenKey#"
+            default="#CreateUUID()#">
+        <cfreturn session[csrfTokenKey]>
+    </cffunction>
+
+
+    <cffunction
+        name="getCSRFMetaTags"
+        returnType="string">
+        <cfreturn '
+            <meta name="csrf-param" value="#getCSRFParam()#">
+            <meta name="csrf-token" value="#getCSRFToken()#">'>
+    </cffunction>
+
+
+    <cffunction
+        name="getCSRFInputTag"
+        returnType="string">
+        <cfreturn '
+            <input type="hidden" name="#getCSRFParam()#" value="#getCSRFToken()#">'>
+    </cffunction>
+
+
+    <cffunction
+        name="verifyCSRFToken"
+        returnType="boolean">
+        <cfreturn isGet()
+            or (valueExists(getCSRFParam())
+                and (getValue(getCSRFParam()) eq getCSRFToken()))>
+    </cffunction>
 </cfcomponent>
