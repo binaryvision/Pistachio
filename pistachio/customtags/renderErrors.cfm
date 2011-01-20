@@ -1,0 +1,26 @@
+<cfparam
+    name="attributes.errors"
+    type="array">
+<cfparam
+    name="attributes.listType"
+    type="string"
+    default="ul">
+<cfparam
+    name="attributes.listClass"
+    type="string"
+    default="errors">
+
+<cfoutput>
+<#attributes.listType#
+    class="#attributes.listClass#">
+    <cfloop
+        index="field"
+        array="#attributes.errors#">
+        <cfloop
+            index="error"
+            array="#field.errors#">
+            <li>#error#</li>
+        </cfloop>
+    </cfloop>
+</#attributes.listType#>
+</cfoutput>

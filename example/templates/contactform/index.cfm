@@ -1,22 +1,14 @@
+<cfimport
+    prefix="p"
+    taglib="/pistachio/customtags">
 <cfoutput>
     <h1>Contact Form</h1>
 
-    <p>
-        <cfoutput>#getPlugin("HelloWorld").greet()#</cfoutput>
-    </p>
+    <p>#getPlugin("HelloWorld").greet()#</p>
 
     <cfif contactForm.hasErrors()>
-        <ul style="color:red;font-weight:bold;">
-            <cfloop
-                index="field"
-                array="#contactForm.getErrors()#">
-                <cfloop
-                    index="error"
-                    array="#field.errors#">
-                    <li>#error#</li>
-                </cfloop>
-            </cfloop>
-        </ul>
+        <p:renderErrors
+            errors="#contactForm.getErrors()#">
     </cfif>
 
     <form
