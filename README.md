@@ -33,7 +33,9 @@ Requirements
 ------------
 
 Pistachio has been written for ColdFusion 9 and nothing else, and has never 
-tested on Railo, or any other CFML engine.
+tested on Railo, or any other CFML engine. You will also need to have the 
+coldfusion dotnet library installed as Pistachio makes use of dotnet regular 
+expressions for routing module requests.
 
 How to setup the example application
 ------------------------------------

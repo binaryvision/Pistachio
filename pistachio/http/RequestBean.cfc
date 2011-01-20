@@ -3,10 +3,10 @@
     <cfparam name="instance" default="#StructNew()#">
     <cfparam name="constants" default="#StructNew()#">
     <cfset constants.HTTP_METHODS = "GET,POST,PUT,DELETE">
-    <cfset constants.HTTP_GET     = "GET">
-    <cfset constants.HTTP_POST    = "POST">
-    <cfset constants.HTTP_PUT     = "PUT">
-    <cfset constants.HTTP_DELETE  = "DELETE">
+    <cfset constants.HTTP_GET = "GET">
+    <cfset constants.HTTP_POST = "POST">
+    <cfset constants.HTTP_PUT = "PUT">
+    <cfset constants.HTTP_DELETE = "DELETE">
     <cfset constants.METHOD_OVERRIDE_PARAM = "_method">
     <cfset constants.METHOD_OVERRIDE_HEADER = "HTTP_X_HTTP_METHOD_OVERRIDE">
 
@@ -47,6 +47,33 @@
         <cfreturn arguments.deepCopy
             ? Duplicate(StructGet("instance.requestData.headers"))
             : StructGet("instance.requestData.headers")>
+    </cffunction>
+
+
+    <cffunction
+        name="getHeader"
+        returnType="any">
+        <cfargument
+            name="key"
+            type="string"
+            required="yes">
+        <cfargument
+            name="default"
+            type="any">
+        <cfreturn (not headerExists(key) and isDefined("arguments.default"))
+            ? default
+            : getHeaders()[key]>
+    </cffunction>
+
+
+    <cffunction
+        name="headerExists"
+        returnType="any">
+        <cfargument
+            name="key"
+            type="string"
+            required="yes">
+        <cfreturn StructKeyExists(getHeaders(), key)>
     </cffunction>
 
 
@@ -111,21 +138,30 @@
     <cffunction
         name="getMethod"
         returnType="string">
-        <cfif getEnv().request_method EQ constants.HTTP_POST>
-            <cfif valueExists(constants.METHOD_OVERRIDE_PARAM)>
-                <cfset var method = UCase(Trim(getValue(constants.METHOD_OVERRIDE_PARAM)))>
-            <cfelse>
-                <cfif StructKeyExists(getHeaders(), constants.METHOD_OVERRIDE_HEADER)>
-                    <cfset var method = UCase(Trim(getHeaders()[constants.METHOD_OVERRIDE_HEADER]))>
-                </cfif>
-            </cfif>
+        <cfset var method = getEnv().request_method>
 
-            <cfif IsDefined("local.method") and ListFind(constants.HTTP_METHODS, method)>
-                <cfreturn method>
+        <cfif method eq constants.HTTP_POST>
+            <cfif valueExists(constants.METHOD_OVERRIDE_PARAM) and
+                isValidHTTPMethod(getValue(constants.METHOD_OVERRIDE_PARAM))>
+                <cfset method = getValue(constants.METHOD_OVERRIDE_PARAM)>
+            <cfelseif headerExists(constants.METHOD_OVERRIDE_HEADER) and
+                isValidHTTPMethod(getHeader(constants.METHOD_OVERRIDE_HEADER))>
+                <cfset method = getHeader(constants.METHOD_OVERRIDE_HEADER)>
             </cfif>
         </cfif>
 
-        <cfreturn getEnv().request_method>
+        <cfreturn ucase(trim(method))>
+    </cffunction>
+
+
+    <cffunction
+        name="isValidHTTPMethod"
+        returnType="boolean">
+        <cfargument
+            name="verb"
+            type="string"
+            required="yes">
+        <cfreturn ListFindNoCase(constants.HTTP_METHODS, trim(verb))>
     </cffunction>
 
 
@@ -142,28 +178,28 @@
     <cffunction
         name="isGet"
         returnType="boolean">
-        <cfreturn getMethod() EQ constants.HTTP_GET>
+        <cfreturn getMethod() eq constants.HTTP_GET>
     </cffunction>
 
 
     <cffunction
         name="isPost"
         returnType="boolean">
-        <cfreturn getMethod() EQ constants.HTTP_POST>
+        <cfreturn getMethod() eq constants.HTTP_POST>
     </cffunction>
 
 
     <cffunction
         name="isPut"
         returnType="boolean">
-        <cfreturn getMethod() EQ constants.HTTP_PUT>
+        <cfreturn getMethod() eq constants.HTTP_PUT>
     </cffunction>
 
 
     <cffunction
         name="isDelete"
         returnType="boolean">
-        <cfreturn getMethod() EQ constants.HTTP_DELETE>
+        <cfreturn getMethod() eq constants.HTTP_DELETE>
     </cffunction>
 
 
@@ -172,7 +208,7 @@
         returnType="boolean">
         <cfreturn
             StructKeyExists(getEnv(), "http_x_requested_with")
-            and (getEnv().http_x_requested_with EQ "XMLHTTPRequest")>
+            and (getEnv().http_x_requested_with eq "XMLHTTPRequest")>
     </cffunction>
 
 

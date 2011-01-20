@@ -138,4 +138,66 @@
 
         <cfset assertEquals(_request.getMethod(), "POST")>
     </cffunction>
+
+
+    <cffunction
+        name="testCanGetHeader">
+        <cfset _request.setRequestData({
+            headers={
+                foo="bar"
+            }
+        })>
+
+        <cfset assertEquals(_request.getHeader("foo"), "bar")>
+    </cffunction>
+
+
+    <cffunction
+        name="testCanCheckHeaderExists">
+        <cfset _request.setRequestData({
+            headers={
+                foo="bar"
+            }
+        })>
+
+        <cfset assertTrue(_request.headerExists("foo"))>
+        <cfset assertFalse(_request.headerExists("moo"))>
+    </cffunction>
+
+
+    <cffunction
+        name="testNestedParamsAreExpanded">
+        <cfset _request.setCollection({
+            "user[username]" = "foo",
+            "user.password" = "bar"
+        })>
+
+        <cfset assertTrue(_request.valueExists("user"))>
+        <cfset assertEquals(_request.getValue("user").username, "foo")>
+        <cfset assertEquals(_request.getValue("user").password, "bar")>
+    </cffunction>
+
+
+    <cffunction
+        name="testOriginalNestedParamsAreKeptIntact">
+        <cfset _request.setCollection({
+            "user[username]" = "foo",
+            "user.password" = "bar"
+        })>
+
+        <cfset assertEquals(_request.getValue("user[username]"), "foo")>
+        <cfset assertEquals(_request.getValue("user.password"), "bar")>
+    </cffunction>
+
+
+    <cffunction
+        name="testNestedParamsDoNotOverwriteExistingParams">
+        <cfset _request.setCollection({
+            "user" = "raw",
+            "user[username]" = "foo",
+            "user.password" = "bar"
+        })>
+
+        <cfset assertEquals(_request.getValue("user"), "raw")>
+    </cffunction>           
 </cfcomponent>
